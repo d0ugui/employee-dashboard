@@ -15,5 +15,9 @@ export const Employee = model(
       type: String,
       required: true,
     },
+    adimissao: {
+      type: Date,
+      default: Date.now,
+    },
   })
 );

@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
 });
 
 // Employee
-router.get("/employee", listEmployee);
-router.post("/employee", createEmployee);
-router.delete("/employee/:id", deleteEmployee);
-router.patch("/employee/:id", updateEmployee);
+router.get("/employees", listEmployee);
+router.post("/employees", createEmployee);
+router.delete("/employees/:id", deleteEmployee);
+router.patch("/employees/:id", updateEmployee);
