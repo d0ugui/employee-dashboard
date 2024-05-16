@@ -1,4 +1,4 @@
-db.createCollection('employee');
+db.createCollection('employees');
 
 const employees = Array.from({ length: 20}, (_, index) => ({
   nome: `Employee ${index}`,
@@ -6,5 +6,5 @@ const employees = Array.from({ length: 20}, (_, index) => ({
   departamento: "Tecnologia"
 }))
 
-db.employee.insertMany(employees);
+db.employees.insertMany(employees);
 
