@@ -3,17 +3,17 @@
 import { Header } from "@/components/Header"
 import { ModalWrapper } from "@/components/Modal"
 import { Search } from "@/components/Search"
-import { THeadButton } from "@/components/THeadButton"
 import { TableItem } from "@/components/TableItem"
 import { IEmployee } from "@/entities/employee"
 import { employeeService } from "@/services/employeeService"
-import { AddIcon } from "@chakra-ui/icons"
+import { AddIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons"
 import {
   Box,
   Button,
   Container,
   Flex,
   Heading,
+  Link,
   Spinner,
   Table,
   Tbody,
@@ -45,12 +45,13 @@ export default function Dashboard() {
 
   const searchParams = useSearchParams()
   const search = searchParams.get("search")
+  const orderBy = searchParams.get("orderBy")
 
   const handleListEmployee = useCallback(async () => {
     try {
       setIsLoading(true)
 
-      const employeesData = await employeeService.getAll(search)
+      const employeesData = await employeeService.getAll(search, orderBy)
 
       setEmployees(employeesData)
     } catch (error) {
@@ -58,7 +59,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false)
     }
-  }, [search])
+  }, [search, orderBy])
 
   async function handleSelectEmployee(employee: IEmployee) {
     setSelectedEmployee(employee)
@@ -67,7 +68,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     ;(async () => handleListEmployee())()
-  }, [search, handleListEmployee])
+  }, [search, orderBy, handleListEmployee])
 
   if (error) {
     return (
@@ -125,19 +126,34 @@ export default function Dashboard() {
                 <Thead>
                   <Tr>
                     <Th>
-                      <THeadButton title="Nome" />
+                      <Link
+                        href={
+                          orderBy === "asc" ? `?orderBy=desc` : `?orderBy=asc`
+                        }
+                      >
+                        <Button
+                          bg="none"
+                          _hover="none"
+                          rightIcon={
+                            orderBy === "asc" ? (
+                              <ChevronUpIcon color="purple" />
+                            ) : (
+                              <ChevronDownIcon color="purple" />
+                            )
+                          }
+                          px="0"
+                          color="gray.600"
+                          textTransform="uppercase"
+                          fontSize="xs"
+                          fontWeight="bold"
+                        >
+                          Nome
+                        </Button>
+                      </Link>
                     </Th>
-                    {isWideVersion && (
-                      <Th>
-                        <THeadButton title="Cargo" />
-                      </Th>
-                    )}
-                    {isWideVersion && (
-                      <Th>
-                        <THeadButton title="Departamento" />
-                      </Th>
-                    )}
-                    {isWideVersion && <Th color="gray.600">Ações</Th>}
+                    {isWideVersion && <Th>Cargo</Th>}
+                    {isWideVersion && <Th>Departamento</Th>}
+                    {isWideVersion && <Th>Ações</Th>}
                   </Tr>
                 </Thead>
 

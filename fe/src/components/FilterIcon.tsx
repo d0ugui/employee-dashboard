@@ -1,7 +1,7 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons"
 
 interface FilterIconProps {
-  filter: "asc" | "desc"
+  filter?: "asc" | "desc"
 }
 
 export function FilterIcon({ filter }: FilterIconProps) {
