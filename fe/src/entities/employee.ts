@@ -1,5 +1,5 @@
 export interface IEmployee {
-  id: string
+  _id: string
   nome: string
   cargo: string
   departamento: string

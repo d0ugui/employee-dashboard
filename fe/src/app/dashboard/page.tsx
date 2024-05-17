@@ -21,7 +21,8 @@ import {
   Th,
   Thead,
   Tr,
-  useBreakpointValue
+  useBreakpointValue,
+  useToast
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { CreateEmployeeForm } from "./components/CreateEmployeeForm"
@@ -37,29 +38,73 @@ export default function Dashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [employees, setEmployees] = useState<IEmployee[]>()
+  const toast = useToast({
+    duration: 4000,
+    isClosable: true,
+    position: "top-right"
+  })
+
+  async function handleListEmployee() {
+    try {
+      setIsLoading(true)
+      const employeesData = await employeeService.getAll()
+
+      setEmployees(employeesData)
+    } catch (error) {
+      setError("Ocorreu um erro ao estabelecer conexão com a API.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
-    ;(async () => {
-      try {
-        setIsLoading(true)
-        const employeesData = await employeeService.getAll()
-
-        setEmployees(employeesData)
-      } catch (error) {
-        setError("Ocorreu um erro ao estabelecer conexão com a API.")
-      } finally {
-        setIsLoading(false)
-      }
-    })()
+    ;(async () => handleListEmployee())()
   }, [])
 
   async function handleCreateEmployee(values: Omit<IEmployee, "id">) {
-    setIsSubmitting(true)
+    try {
+      setIsSubmitting(true)
 
-    await employeeService.create(values)
+      await employeeService.create(values)
 
-    setIsSubmitting(false)
-    setIsEmployeeModalOpen(false)
+      toast({
+        description: "Funcionário cadastrado.",
+        status: "success"
+      })
+
+      await handleListEmployee()
+    } catch (error) {
+      toast({
+        description: "Ocorreu um problema ao registrar o funcionário.",
+        status: "error"
+      })
+    } finally {
+      setIsSubmitting(false)
+      setIsEmployeeModalOpen(false)
+    }
+  }
+
+  async function handleDeleteEmployee(id: string) {
+    try {
+      setIsSubmitting(true)
+
+      await employeeService.remove(id)
+
+      toast({
+        description: "Funcionário deletado.",
+        status: "success"
+      })
+
+      await handleListEmployee()
+    } catch (error) {
+      toast({
+        description: "Token inválido.",
+        status: "error"
+      })
+    } finally {
+      setIsSubmitting(false)
+      setIsEmployeeModalOpen(false)
+    }
   }
 
   if (error) {
@@ -137,44 +182,46 @@ export default function Dashboard() {
                 <Tbody>
                   {employees &&
                     employees.map((employee) => (
-                      <>
-                        <Tr
-                          border="2px"
-                          borderColor="#DFDFDF"
-                          borderRadius="md"
-                          key={employee.id}
-                        >
+                      <Tr
+                        border="2px"
+                        borderColor="#DFDFDF"
+                        borderRadius="md"
+                        key={employee._id}
+                      >
+                        <Td>
+                          <Text fontWeight="bold">{employee.nome}</Text>
+                        </Td>
+                        {isWideVersion && <Td>{employee.cargo}</Td>}
+                        {isWideVersion && <Td>{employee.departamento}</Td>}
+                        {isWideVersion && (
                           <Td>
-                            <Text fontWeight="bold">{employee.nome}</Text>
+                            <Flex gap="2">
+                              <Button
+                                as="a"
+                                size="sm"
+                                fontSize="sm"
+                                color="primary"
+                                leftIcon={<ChatIcon h={4} w={4} />}
+                              >
+                                Editar
+                              </Button>
+                              <Button
+                                as="a"
+                                size="sm"
+                                fontSize="sm"
+                                color="danger"
+                                leftIcon={<DeleteIcon h={4} w={4} />}
+                                isLoading={isSubmitting}
+                                onClick={() =>
+                                  handleDeleteEmployee(employee._id)
+                                }
+                              >
+                                Excluir
+                              </Button>
+                            </Flex>
                           </Td>
-                          {isWideVersion && <Td>{employee.cargo}</Td>}
-                          {isWideVersion && <Td>{employee.departamento}</Td>}
-                          {isWideVersion && (
-                            <Td>
-                              <Flex gap="2">
-                                <Button
-                                  as="a"
-                                  size="sm"
-                                  fontSize="sm"
-                                  color="primary"
-                                  leftIcon={<ChatIcon h={4} w={4} />}
-                                >
-                                  Editar
-                                </Button>
-                                <Button
-                                  as="a"
-                                  size="sm"
-                                  fontSize="sm"
-                                  color="danger"
-                                  leftIcon={<DeleteIcon h={4} w={4} />}
-                                >
-                                  Excluir
-                                </Button>
-                              </Flex>
-                            </Td>
-                          )}
-                        </Tr>
-                      </>
+                        )}
+                      </Tr>
                     ))}
                 </Tbody>
               </Table>
