@@ -3,7 +3,11 @@ import { Employee } from "../../app/models/Employee";
 
 export async function listEmployee(req: Request, res: Response) {
   try {
-    const employees = await Employee.find();
+    const search = req.query.search || "";
+
+    const employees = await Employee.find({
+      nome: { $regex: search, $options: "i" },
+    });
 
     res.json(employees);
   } catch (error) {
