@@ -2,11 +2,23 @@
 
 import { Header } from "@/components/Header"
 import { Search } from "@/components/Search"
+import { THeadButton } from "@/components/THeadButton"
+import { AddIcon, ChatIcon, DeleteIcon } from "@chakra-ui/icons"
 import {
   Box,
   Button,
+  Container,
   Flex,
+  FormLabel,
   Heading,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Table,
   Tbody,
   Td,
@@ -16,6 +28,7 @@ import {
   Tr,
   useBreakpointValue
 } from "@chakra-ui/react"
+import { useState } from "react"
 
 const employees = [
   {
@@ -126,58 +139,86 @@ export default function Dashboard() {
     lg: true
   })
 
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <Flex w="100vw" align="center" justify="center" bg="white" flexDir="column">
+    <Container w="100vw" maxW="1200" bg="white">
       <Header />
 
-      <Flex
-        w="100%"
-        maxW="1200px"
-        flexDir="column"
-        alignItems="flex-start"
-        mt="10"
-      >
-        <Heading as="h2" size="md">
-          Filtros
-        </Heading>
+      <Flex flex="1" mt="10" alignItems="end" justifyContent="space-between">
+        <Flex flexDir="column" alignItems="flex-start">
+          <Heading as="h2" size="md">
+            Filtros
+          </Heading>
 
-        <Search />
+          <Search />
+        </Flex>
+
+        <Flex as="label" border="2px" borderColor="#fff">
+          <Button
+            leftIcon={<AddIcon />}
+            onClick={() => setIsOpen(true)}
+            color="white"
+            bg="done"
+          >
+            Criar novo
+          </Button>
+        </Flex>
       </Flex>
 
-      <Box flex="1" borderRadius={8} maxW={1200} w="full" mt="10">
-        <Flex w="100%" maxWidth={1200} mx="auto">
+      <Box flex="1" borderRadius={8} mt="10">
+        <Flex mx="auto">
           <Table colorScheme="whiteAlpha">
             <Thead>
               <Tr>
-                <Th>Nome</Th>
-                {isWideVersion && <Th>Cargo</Th>}
-                {isWideVersion && <Th>Departamento</Th>}
-                {isWideVersion && <Th>Action</Th>}
+                <Th>
+                  <THeadButton title="Nome" />
+                </Th>
+                {isWideVersion && (
+                  <Th>
+                    <THeadButton title="Cargo" />
+                  </Th>
+                )}
+                {isWideVersion && (
+                  <Th>
+                    <THeadButton title="Departamento" />
+                  </Th>
+                )}
+                {isWideVersion && <Th color="gray.600">Ações</Th>}
               </Tr>
             </Thead>
 
-            <Tbody gap="2">
+            <Tbody>
               {employees.map((user) => (
                 <>
                   <Tr border="2px" borderColor="#DFDFDF" borderRadius="md">
                     <Td>
-                      <Box>
-                        <Text fontWeight="bold">{user.name}</Text>
-                      </Box>
+                      <Text fontWeight="bold">{user.name}</Text>
                     </Td>
                     {isWideVersion && <Td>{user.position}</Td>}
                     {isWideVersion && <Td>{user.workArea}</Td>}
                     {isWideVersion && (
                       <Td>
-                        <Button
-                          as="a"
-                          size="sm"
-                          fontSize="sm"
-                          colorScheme="purple"
-                          // leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                        >
-                          Editar
-                        </Button>
+                        <Flex gap="2">
+                          <Button
+                            as="a"
+                            size="sm"
+                            fontSize="sm"
+                            color="primary"
+                            leftIcon={<ChatIcon h={4} w={4} />}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            as="a"
+                            size="sm"
+                            fontSize="sm"
+                            color="danger"
+                            leftIcon={<DeleteIcon h={4} w={4} />}
+                          >
+                            Excluir
+                          </Button>
+                        </Flex>
                       </Td>
                     )}
                   </Tr>
@@ -187,6 +228,49 @@ export default function Dashboard() {
           </Table>
         </Flex>
       </Box>
-    </Flex>
+
+      <Box>
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Cadastro de Funcionário</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Flex gap="2" flexDir="column">
+                <Box>
+                  <FormLabel htmlFor="nome">Nome</FormLabel>
+                  <Input placeholder="Nome" name="nome" id="nome" />
+                </Box>
+
+                <Box>
+                  <FormLabel htmlFor="cargo">Cargo</FormLabel>
+                  <Input placeholder="Cargo" name="cargo" id="cargo" />
+                </Box>
+
+                <Box>
+                  <FormLabel htmlFor="departamento">Departamento</FormLabel>
+                  <Input
+                    placeholder="Departamento"
+                    name="departamento"
+                    id="departamento"
+                  />
+                </Box>
+              </Flex>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={() => setIsOpen(false)}
+              >
+                Fechar
+              </Button>
+              <Button colorScheme="green">Cadastrar</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+    </Container>
   )
 }
