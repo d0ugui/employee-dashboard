@@ -10,7 +10,7 @@ export function THeadButton({ title }: THeadButton) {
     <Button
       bg="none"
       _hover="none"
-      rightIcon={<FilterIcon filter="desc" />}
+      rightIcon={<FilterIcon filter="asc" />}
       px="0"
       color="gray.600"
       textTransform="uppercase"
