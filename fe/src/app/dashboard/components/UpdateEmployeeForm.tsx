@@ -1,4 +1,5 @@
 import { IEmployee } from "@/entities/employee"
+import { employeeService } from "@/services/employeeService"
 import {
   Button,
   Flex,
@@ -9,9 +10,11 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalHeader
+  ModalHeader,
+  useToast
 } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 
 import z from "zod"
@@ -27,16 +30,16 @@ type FormData = z.infer<typeof updateEmployeeForm>
 
 interface UpdateEmployeeModal {
   setIsOpen(state: boolean): void
-  onSubmit(values: FormData): void
-  isLoading: boolean
   employeeData: IEmployee
+  setSelectedEmployee(value: IEmployee | null): void
+  handleListEmployee(): void
 }
 
 export function UpdateEmployeeForm({
   setIsOpen,
-  onSubmit,
-  isLoading,
-  employeeData
+  employeeData,
+  setSelectedEmployee,
+  handleListEmployee
 }: UpdateEmployeeModal) {
   const {
     register,
@@ -47,6 +50,39 @@ export function UpdateEmployeeForm({
     defaultValues: employeeData
   })
 
+  const toast = useToast({
+    duration: 4000,
+    isClosable: true,
+    position: "top-right"
+  })
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  async function handleUpdateEmployee(values: IEmployee) {
+    try {
+      setIsLoading(true)
+
+      await employeeService.update(values)
+      setSelectedEmployee(null)
+
+      toast({
+        description: "Funcionário atualizado som sucesso.",
+        status: "success"
+      })
+
+      await handleListEmployee()
+    } catch (error) {
+      toast({
+        description:
+          "Ocorreu um problema ao atualizar os dados do funcionário.",
+        status: "error"
+      })
+    } finally {
+      setIsLoading(false)
+      setIsOpen(false)
+    }
+  }
+
   return (
     <ModalContent>
       <ModalHeader>Atualização de Funcionário</ModalHeader>
@@ -56,7 +92,7 @@ export function UpdateEmployeeForm({
           as="form"
           gap="2"
           flexDir="column"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(handleUpdateEmployee)}
         >
           <FormControl isInvalid={Boolean(errors.nome)}>
             <FormLabel htmlFor="nome" color="secondary">

@@ -4,9 +4,10 @@ import { Header } from "@/components/Header"
 import { ModalWrapper } from "@/components/Modal"
 import { Search } from "@/components/Search"
 import { THeadButton } from "@/components/THeadButton"
+import { TableItem } from "@/components/TableItem"
 import { IEmployee } from "@/entities/employee"
 import { employeeService } from "@/services/employeeService"
-import { AddIcon, ChatIcon, DeleteIcon } from "@chakra-ui/icons"
+import { AddIcon } from "@chakra-ui/icons"
 import {
   Box,
   Button,
@@ -16,13 +17,10 @@ import {
   Spinner,
   Table,
   Tbody,
-  Td,
-  Text,
   Th,
   Thead,
   Tr,
-  useBreakpointValue,
-  useToast
+  useBreakpointValue
 } from "@chakra-ui/react"
 import { useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
@@ -42,14 +40,8 @@ export default function Dashboard() {
   const [isUpdateEmployeeModalOpen, setIsUpdateEmployeeModalOpen] =
     useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [employees, setEmployees] = useState<IEmployee[]>()
-  const toast = useToast({
-    duration: 4000,
-    isClosable: true,
-    position: "top-right"
-  })
 
   const searchParams = useSearchParams()
   const search = searchParams.get("search")
@@ -67,77 +59,6 @@ export default function Dashboard() {
       setIsLoading(false)
     }
   }, [search])
-
-  async function handleCreateEmployee(values: Omit<IEmployee, "id">) {
-    try {
-      setIsSubmitting(true)
-
-      await employeeService.create(values)
-
-      toast({
-        description: "Funcionário cadastrado.",
-        status: "success"
-      })
-
-      await handleListEmployee()
-    } catch (error) {
-      toast({
-        description: "Ocorreu um problema ao registrar o funcionário.",
-        status: "error"
-      })
-    } finally {
-      setIsSubmitting(false)
-      setIsEmployeeModalOpen(false)
-    }
-  }
-
-  async function handleUpdateEmployee(values: IEmployee) {
-    try {
-      setIsSubmitting(true)
-
-      await employeeService.update(values)
-      setSelectedEmployee(null)
-
-      toast({
-        description: "Funcionário atualizado som sucesso.",
-        status: "success"
-      })
-
-      await handleListEmployee()
-    } catch (error) {
-      toast({
-        description:
-          "Ocorreu um problema ao atualizar os dados do funcionário.",
-        status: "error"
-      })
-    } finally {
-      setIsSubmitting(false)
-      setIsEmployeeModalOpen(false)
-    }
-  }
-
-  async function handleDeleteEmployee(id: string) {
-    try {
-      setIsSubmitting(true)
-
-      await employeeService.remove(id)
-
-      toast({
-        description: "Funcionário deletado.",
-        status: "success"
-      })
-
-      await handleListEmployee()
-    } catch (error) {
-      toast({
-        description: "Token inválido.",
-        status: "error"
-      })
-    } finally {
-      setIsSubmitting(false)
-      setIsEmployeeModalOpen(false)
-    }
-  }
 
   async function handleSelectEmployee(employee: IEmployee) {
     setSelectedEmployee(employee)
@@ -223,47 +144,12 @@ export default function Dashboard() {
                 <Tbody>
                   {employees &&
                     employees.map((employee) => (
-                      <Tr
-                        border="2px"
-                        borderColor="#DFDFDF"
-                        borderRadius="md"
+                      <TableItem
                         key={employee._id}
-                      >
-                        <Td>
-                          <Text fontWeight="bold">{employee.nome}</Text>
-                        </Td>
-                        {isWideVersion && <Td>{employee.cargo}</Td>}
-                        {isWideVersion && <Td>{employee.departamento}</Td>}
-                        {isWideVersion && (
-                          <Td>
-                            <Flex gap="2">
-                              <Button
-                                as="a"
-                                size="sm"
-                                fontSize="sm"
-                                color="primary"
-                                leftIcon={<ChatIcon h={4} w={4} />}
-                                onClick={() => handleSelectEmployee(employee)}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                as="a"
-                                size="sm"
-                                fontSize="sm"
-                                color="danger"
-                                leftIcon={<DeleteIcon h={4} w={4} />}
-                                isLoading={isSubmitting}
-                                onClick={() =>
-                                  handleDeleteEmployee(employee._id)
-                                }
-                              >
-                                Excluir
-                              </Button>
-                            </Flex>
-                          </Td>
-                        )}
-                      </Tr>
+                        employee={employee}
+                        handleSelectEmployee={handleSelectEmployee}
+                        handleListEmployee={handleListEmployee}
+                      />
                     ))}
                 </Tbody>
               </Table>
@@ -277,8 +163,7 @@ export default function Dashboard() {
             >
               <CreateEmployeeForm
                 setIsOpen={setIsEmployeeModalOpen}
-                onSubmit={handleCreateEmployee}
-                isLoading={isSubmitting}
+                handleListEmployee={handleListEmployee}
               />
             </ModalWrapper>
           )}
@@ -290,9 +175,9 @@ export default function Dashboard() {
             >
               <UpdateEmployeeForm
                 setIsOpen={setIsUpdateEmployeeModalOpen}
-                onSubmit={handleUpdateEmployee}
-                isLoading={isSubmitting}
+                setSelectedEmployee={setSelectedEmployee}
                 employeeData={selectedEmployee}
+                handleListEmployee={handleListEmployee}
               />
             </ModalWrapper>
           )}

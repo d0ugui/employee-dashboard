@@ -1,3 +1,4 @@
+import { employeeService } from "@/services/employeeService"
 import {
   Button,
   Flex,
@@ -8,9 +9,11 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalHeader
+  ModalHeader,
+  useToast
 } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 
 import z from "zod"
@@ -25,14 +28,12 @@ type FormData = z.infer<typeof createEmployeeForm>
 
 interface CreateEmployeeModal {
   setIsOpen(state: boolean): void
-  onSubmit(values: FormData): void
-  isLoading: boolean
+  handleListEmployee(): void
 }
 
 export function CreateEmployeeForm({
   setIsOpen,
-  onSubmit,
-  isLoading
+  handleListEmployee
 }: CreateEmployeeModal) {
   const {
     register,
@@ -41,6 +42,37 @@ export function CreateEmployeeForm({
   } = useForm<FormData>({
     resolver: zodResolver(createEmployeeForm)
   })
+
+  const toast = useToast({
+    duration: 4000,
+    isClosable: true,
+    position: "top-right"
+  })
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  async function handleCreateEmployee(values: FormData) {
+    try {
+      setIsLoading(true)
+
+      await employeeService.create(values)
+
+      toast({
+        description: "Funcionário cadastrado.",
+        status: "success"
+      })
+
+      await handleListEmployee()
+    } catch (error) {
+      toast({
+        description: "Ocorreu um problema ao registrar o funcionário.",
+        status: "error"
+      })
+    } finally {
+      setIsLoading(false)
+      setIsOpen(false)
+    }
+  }
 
   return (
     <ModalContent>
@@ -51,7 +83,7 @@ export function CreateEmployeeForm({
           as="form"
           gap="2"
           flexDir="column"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(handleCreateEmployee)}
         >
           <FormControl isInvalid={Boolean(errors.nome)}>
             <FormLabel htmlFor="nome" color="secondary">
