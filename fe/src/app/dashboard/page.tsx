@@ -1,6 +1,7 @@
 "use client"
 
 import { Header } from "@/components/Header"
+import { ModalWrapper } from "@/components/Modal"
 import { Search } from "@/components/Search"
 import { THeadButton } from "@/components/THeadButton"
 import { IEmployee } from "@/entities/employee"
@@ -11,16 +12,7 @@ import {
   Button,
   Container,
   Flex,
-  FormLabel,
   Heading,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Spinner,
   Table,
   Tbody,
@@ -32,6 +24,7 @@ import {
   useBreakpointValue
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
+import { CreateEmployeeForm } from "./components/CreateEmployeeForm"
 
 export default function Dashboard() {
   const isWideVersion = useBreakpointValue({
@@ -39,8 +32,9 @@ export default function Dashboard() {
     lg: true
   })
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [employees, setEmployees] = useState<IEmployee[]>()
 
@@ -58,6 +52,15 @@ export default function Dashboard() {
       }
     })()
   }, [])
+
+  async function handleCreateEmployee(values: Omit<IEmployee, "id">) {
+    setIsSubmitting(true)
+
+    await employeeService.create(values)
+
+    setIsSubmitting(false)
+    setIsEmployeeModalOpen(false)
+  }
 
   if (error) {
     return (
@@ -100,7 +103,7 @@ export default function Dashboard() {
             <Flex as="label" border="2px" borderColor="#fff">
               <Button
                 leftIcon={<AddIcon />}
-                onClick={() => setIsOpen(true)}
+                onClick={() => setIsEmployeeModalOpen(true)}
                 color="white"
                 bg="done"
               >
@@ -178,48 +181,18 @@ export default function Dashboard() {
             </Flex>
           </Box>
 
-          <Box>
-            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>Cadastro de Funcionário</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                  <Flex gap="2" flexDir="column">
-                    <Box>
-                      <FormLabel htmlFor="nome">Nome</FormLabel>
-                      <Input placeholder="Nome" name="nome" id="nome" />
-                    </Box>
-
-                    <Box>
-                      <FormLabel htmlFor="cargo">Cargo</FormLabel>
-                      <Input placeholder="Cargo" name="cargo" id="cargo" />
-                    </Box>
-
-                    <Box>
-                      <FormLabel htmlFor="departamento">Departamento</FormLabel>
-                      <Input
-                        placeholder="Departamento"
-                        name="departamento"
-                        id="departamento"
-                      />
-                    </Box>
-                  </Flex>
-                </ModalBody>
-
-                <ModalFooter>
-                  <Button
-                    colorScheme="blue"
-                    mr={3}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Fechar
-                  </Button>
-                  <Button colorScheme="green">Cadastrar</Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-          </Box>
+          {isEmployeeModalOpen && (
+            <ModalWrapper
+              isOpen={isEmployeeModalOpen}
+              setIsOpen={setIsEmployeeModalOpen}
+            >
+              <CreateEmployeeForm
+                setIsOpen={setIsEmployeeModalOpen}
+                onSubmit={handleCreateEmployee}
+                isLoading={isSubmitting}
+              />
+            </ModalWrapper>
+          )}
         </>
       )}
     </Container>
