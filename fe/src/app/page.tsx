@@ -41,9 +41,11 @@ export default function Home() {
           Criar conta
         </Link>
 
-        <Button colorScheme="blue" bg="primary" h="48px" mt="12px">
-          Entrar
-        </Button>
+        <Link href="/dashboard">
+          <Button colorScheme="blue" bg="primary" h="48px" mt="12px">
+            Entrar
+          </Button>
+        </Link>
       </Flex>
     </Flex>
   )

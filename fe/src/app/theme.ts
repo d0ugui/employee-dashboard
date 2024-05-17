@@ -9,6 +9,7 @@ export const theme = extendTheme({
     primary: "#5D5FEF",
     secondary: "#878790",
     done: "#26B144",
-    danger: "#FF0000"
+    danger: "#FF0000",
+    text: "#9699B0"
   }
 })
