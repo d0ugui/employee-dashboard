@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { AuthMiddleware } from "./app/middlewares/auth";
 import { createEmployee } from "./useCases/employee/createEmployee";
 import { deleteEmployee } from "./useCases/employee/deleteEmployee";
 import { listEmployee } from "./useCases/employee/listEmployee";
@@ -17,8 +16,8 @@ router.get("/", async (req, res) => {
 // Employee
 router.get("/employees", listEmployee);
 router.post("/employees", createEmployee);
-router.delete("/employees/:id", AuthMiddleware, deleteEmployee);
-router.patch("/employees/:id", AuthMiddleware, updateEmployee);
+router.delete("/employees/:id", deleteEmployee);
+router.patch("/employees/:id", updateEmployee);
 
 // User
 router.post("/user", createUser);
