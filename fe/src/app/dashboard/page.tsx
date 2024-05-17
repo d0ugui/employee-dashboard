@@ -24,7 +24,8 @@ import {
   useBreakpointValue,
   useToast
 } from "@chakra-ui/react"
-import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import { CreateEmployeeForm } from "./components/CreateEmployeeForm"
 import { UpdateEmployeeForm } from "./components/UpdateEmployeeForm"
 
@@ -50,10 +51,14 @@ export default function Dashboard() {
     position: "top-right"
   })
 
-  async function handleListEmployee() {
+  const searchParams = useSearchParams()
+  const search = searchParams.get("search")
+
+  const handleListEmployee = useCallback(async () => {
     try {
       setIsLoading(true)
-      const employeesData = await employeeService.getAll()
+
+      const employeesData = await employeeService.getAll(search)
 
       setEmployees(employeesData)
     } catch (error) {
@@ -61,7 +66,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [search])
 
   async function handleCreateEmployee(values: Omit<IEmployee, "id">) {
     try {
@@ -141,7 +146,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     ;(async () => handleListEmployee())()
-  }, [])
+  }, [search, handleListEmployee])
 
   if (error) {
     return (
