@@ -4,7 +4,7 @@
 
 # Employee Dashboard
 
-Esse projeto foi desenvolvido como proposta de desafio técnico para uma oportunidade de Desenvolvedor Full Stack. A aplicação foi desenvolvida do completo zero, sendo um dashboard simples para manutenção de funcionários, permitindo ao usuário realizer operações de CRUD (create, read, update e delete). A príncipio não foi feita a implementação da autenticação no front-end, porém o back-end já possui as entidades, rotas e lógicas criadas.
+Esse projeto foi desenvolvido como desafio técnico para uma oportunidade de Desenvolvedor Full Stack. A aplicação foi desenvolvida do completo zero, sendo um dashboard simples para manutenção de funcionários, permitindo ao usuário realizar operações de CRUD (create, read, update e delete). A príncipio não foi feita a implementação da autenticação no front-end, porém o back-end já possui as entidades, rotas e lógicas criadas.
 
 ## Tech Stack
 
