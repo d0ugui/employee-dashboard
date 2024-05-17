@@ -26,6 +26,7 @@ import {
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { CreateEmployeeForm } from "./components/CreateEmployeeForm"
+import { UpdateEmployeeForm } from "./components/UpdateEmployeeForm"
 
 export default function Dashboard() {
   const isWideVersion = useBreakpointValue({
@@ -33,7 +34,12 @@ export default function Dashboard() {
     lg: true
   })
 
+  const [selectedEmployee, setSelectedEmployee] = useState<IEmployee | null>(
+    null
+  )
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false)
+  const [isUpdateEmployeeModalOpen, setIsUpdateEmployeeModalOpen] =
+    useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
@@ -57,10 +63,6 @@ export default function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    ;(async () => handleListEmployee())()
-  }, [])
-
   async function handleCreateEmployee(values: Omit<IEmployee, "id">) {
     try {
       setIsSubmitting(true)
@@ -76,6 +78,31 @@ export default function Dashboard() {
     } catch (error) {
       toast({
         description: "Ocorreu um problema ao registrar o funcionário.",
+        status: "error"
+      })
+    } finally {
+      setIsSubmitting(false)
+      setIsEmployeeModalOpen(false)
+    }
+  }
+
+  async function handleUpdateEmployee(values: IEmployee) {
+    try {
+      setIsSubmitting(true)
+
+      await employeeService.update(values)
+      setSelectedEmployee(null)
+
+      toast({
+        description: "Funcionário atualizado som sucesso.",
+        status: "success"
+      })
+
+      await handleListEmployee()
+    } catch (error) {
+      toast({
+        description:
+          "Ocorreu um problema ao atualizar os dados do funcionário.",
         status: "error"
       })
     } finally {
@@ -106,6 +133,15 @@ export default function Dashboard() {
       setIsEmployeeModalOpen(false)
     }
   }
+
+  async function handleSelectEmployee(employee: IEmployee) {
+    setSelectedEmployee(employee)
+    setIsUpdateEmployeeModalOpen(true)
+  }
+
+  useEffect(() => {
+    ;(async () => handleListEmployee())()
+  }, [])
 
   if (error) {
     return (
@@ -202,6 +238,7 @@ export default function Dashboard() {
                                 fontSize="sm"
                                 color="primary"
                                 leftIcon={<ChatIcon h={4} w={4} />}
+                                onClick={() => handleSelectEmployee(employee)}
                               >
                                 Editar
                               </Button>
@@ -237,6 +274,20 @@ export default function Dashboard() {
                 setIsOpen={setIsEmployeeModalOpen}
                 onSubmit={handleCreateEmployee}
                 isLoading={isSubmitting}
+              />
+            </ModalWrapper>
+          )}
+
+          {isUpdateEmployeeModalOpen && selectedEmployee && (
+            <ModalWrapper
+              isOpen={isUpdateEmployeeModalOpen}
+              setIsOpen={setIsUpdateEmployeeModalOpen}
+            >
+              <UpdateEmployeeForm
+                setIsOpen={setIsUpdateEmployeeModalOpen}
+                onSubmit={handleUpdateEmployee}
+                isLoading={isSubmitting}
+                employeeData={selectedEmployee}
               />
             </ModalWrapper>
           )}
