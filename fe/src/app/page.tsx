@@ -72,16 +72,17 @@ export default function Home() {
               Criar conta
             </Link>
 
-            <Button
-              colorScheme="blue"
-              bg="primary"
-              h="48px"
-              mt="12px"
-              w="full"
-              type="submit"
-            >
-              Entrar
-            </Button>
+            <Link href="/dashboard">
+              <Button
+                colorScheme="blue"
+                bg="primary"
+                h="48px"
+                mt="12px"
+                w="full"
+              >
+                Entrar
+              </Button>
+            </Link>
           </Flex>
         </Stack>
       </Flex>
