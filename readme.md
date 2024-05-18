@@ -12,10 +12,11 @@ Esse projeto foi desenvolvido como desafio técnico para uma oportunidade de Des
 
 ## Getting Started
 
-1. **Create containers**: `docker compose up -d`
-2. **Install dependencies in both folders (back e front)**: `npm install or yarn`
-3. **Run back-end(inside back-end folder)**: `npm run dev or yarn dev`
-4. **Run front-end(inside front-end folder)**: `npm run dev or yarn dev`
+1. **Clone project**: `git clone git@github.com:d0ugui/employee-dashboard.git`
+2. **Create containers**: `cd employee-dashboard && docker compose up -d`
+3. **Install dependencies in both folders (api e fe)**: `npm install or yarn`
+4. **Run back-end(inside api folder)**: `npm run dev or yarn dev`
+5. **Run front-end(inside fe folder)**: `npm run dev or yarn dev`
 
 ## License
 
