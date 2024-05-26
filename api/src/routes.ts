@@ -1,11 +1,6 @@
 import { Router } from "express";
-import { createEmployee } from "./useCases/employee/createEmployee";
-import { deleteEmployee } from "./useCases/employee/deleteEmployee";
-import { listEmployee } from "./useCases/employee/listEmployee";
-import { updateEmployee } from "./useCases/employee/updateEmployee";
-import { authenticateUser } from "./useCases/user/authenticateUser";
-import { createUser } from "./useCases/user/createUser";
-import { listUser } from "./useCases/user/listUser";
+import { EmployeesRoutes } from "./http/controllers/employees/route";
+import { UsersRoutes } from "./http/controllers/users/route";
 
 export const router = Router();
 
@@ -13,13 +8,7 @@ router.get("/", async (req, res) => {
   return res.json({ hello: "World" });
 });
 
-// Employee
-router.get("/employees", listEmployee);
-router.post("/employees", createEmployee);
-router.delete("/employees/:id", deleteEmployee);
-router.patch("/employees/:id", updateEmployee);
-
-// User
-router.post("/user", createUser);
-router.get("/user", listUser);
-router.post("/user/autenticate", authenticateUser);
+// employees-routes
+EmployeesRoutes(router);
+// users-routes
+UsersRoutes(router);
